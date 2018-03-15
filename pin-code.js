@@ -14,7 +14,8 @@ class CodePin extends Component {
       error: '',
       number: codeLength,
       code: new Array(codeLength).fill(''),
-      edit: 0
+      edit: 0,
+      isFill: new Array(codeLength).fill(false,0, 3)
     };
 
     this.textInputsRefs = [];
@@ -64,10 +65,15 @@ class CodePin extends Component {
     let newCode = this.state.code.slice();
     newCode[id] = number;
 
+    this.state.isFill[id] = true;
     // User filling the last pin ?
     if (id === this.state.number - 1) {
       this.focus(0);
 
+      this.setState({
+        isFill: new Array(4).fill(false,0, 3)
+      });
+      
       // App pass a checkPinCode function
       if (this.props.checkPinCode) {
         this.props.checkPinCode(newCode.join(''), success => {
@@ -76,10 +82,12 @@ class CodePin extends Component {
             this.setState({
               error: this.props.error,
               code: new Array(this.state.number).fill(''),
-              edit: 0
+              edit: 0,
+              isFill: new Array(4).fill(false,0, 3)
             });
           } else {
             // Is Okey !!!
+            console.log('is okay')
             this.props.success();
           }
         });
@@ -93,7 +101,8 @@ class CodePin extends Component {
         this.setState({
           error: this.props.error,
           code: new Array(this.state.number).fill(''),
-          edit: 0
+          edit: 0,
+          isFill: new Array(4).fill(false,0, 3)
         });
 
         return;
@@ -149,7 +158,7 @@ class CodePin extends Component {
           onChangeText={text => this.handleEdit(text, id)}
           onFocus={() => this.isFocus(id)}
           value={value}
-          style={[codePinStyles.pin, pinStyle]}
+          style={[ this.state.isFill[id] ? codePinStyles.pin :  codePinStyles.pin2, pinStyle]}
           returnKeyType={'done'}
           autoCapitalize={'sentences'}
           autoCorrect={false}
